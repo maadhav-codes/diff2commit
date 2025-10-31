@@ -36,11 +36,11 @@ jobs:
 
       - name: Run type checking
         run: |
-          mypy src/ai_commit
+          mypy src/diff2commit
 
       - name: Run tests
         run: |
-          pytest tests/ --cov=ai_commit --cov-report=xml --cov-report=term
+          pytest tests/ --cov=diff2commit --cov-report=xml --cov-report=term
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3

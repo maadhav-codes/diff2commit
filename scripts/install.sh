@@ -31,7 +31,7 @@ if command -v diff2commit &> /dev/null; then
     diff2commit version
     echo ""
     echo "Next steps:"
-    echo "1. Set your API key: export AI_COMMIT_API_KEY='your-key'"
+    echo "1. Set your API key: export D2C_API_KEY='your-key'"
     echo "2. Stage some changes: git add ."
     echo "3. Generate commit: diff2commit generate"
 else

@@ -53,7 +53,7 @@ By participating in this project, you agree to abide by our Code of Conduct. Ple
    pytest tests/
    ruff check .
    black .
-   mypy src/ai_commit
+   mypy src/diff2commit
    ```
 
 5. **Commit your changes**:

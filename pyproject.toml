@@ -1,0 +1,79 @@
+[build-system]
+requires = ["setuptools>=58.0.4", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "diff2commit"
+version = "1.0.0"
+description = "CLI tool that automatically generates clear, descriptive commit messages from staged Git diffs using AI"
+authors = [{name = "Mayur Dayal", email = "mayurdayal.engineer@gmail.com"}]
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["git", "commit", "ai", "cli", "conventional-commits"]
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Version Control :: Git",
+]
+
+dependencies = [
+    "anthropic>=0.72.0",
+    "gitpython>=3.1.45",
+    "openai>=2.6.1",
+    "prompt-toolkit>=3.0.52",
+    "pydantic>=2.12.3",
+    "pydantic-settings>=2.11.0",
+    "python-dotenv>=1.2.1",
+    "requests>=2.32.5",
+    "rich>=14.2.0",
+    "tenacity>=9.1.2",
+    "typer>=0.20.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
+    "pytest-mock>=3.15.1",
+    "black>=25.9.0",
+    "ruff>=0.14.3",
+    "mypy>=1.18.2",
+]
+
+[project.scripts]
+diff2commit = "diff2commit.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/maadhav-codes/diff2commit"
+Documentation = "https://github.com/maadhav-codes/diff2commit#readme"
+Repository = "https://github.com/maadhav-codes/diff2commit"
+Issues = "https://github.com/maadhav-codes/diff2commit/issues"
+
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311']
+
+[tool.ruff]
+line-length = 100
+target-version = "py38"
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --cov=diff2commit --cov-report=term-missing"

@@ -80,9 +80,15 @@ class GitOperations:
             # Initial commit
             full_diff = self.repo.git.diff("--staged", "--cached")
 
+        additions = 0
+        deletions = 0
+
         # Count additions and deletions
-        additions = full_diff.count("\\n+") - full_diff.count("\\n+++")
-        deletions = full_diff.count("\\n-") - full_diff.count("\\n---")
+        for line in full_diff.splitlines():
+            if line.startswith("+") and not line.startswith("+++"):
+                additions += 1
+            elif line.startswith("-") and not line.startswith("---"):
+                deletions += 1
 
         return DiffSummary(
             files_changed=files_changed,

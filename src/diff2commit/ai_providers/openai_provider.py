@@ -68,8 +68,12 @@ class OpenAIProvider(AIProvider):
                 temperature=self.config.temperature,
             )
 
-            # Extract message
-            message_text = response.choices[0].message.content.strip()
+            # Extract message with None check
+            content = response.choices[0].message.content
+            if content is None:
+                raise RuntimeError("OpenAI returned empty content")
+
+            message_text = content.strip()
             tokens = response.usage.total_tokens if response.usage else 0
             cost = self._calculate_cost(tokens, self.model)
 

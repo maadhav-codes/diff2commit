@@ -2,7 +2,8 @@
 
 from typing import Optional, Literal
 from pathlib import Path
-from pydantic import Field, field_validator
+
+from pydantic import Field, field_validator, ValidationInfo
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -54,7 +55,7 @@ class Diff2CommitConfig(BaseSettings):
 
     @field_validator("api_key")
     @classmethod
-    def validate_api_key(cls, v: Optional[str], info) -> Optional[str]:
+    def validate_api_key(cls, v: Optional[str], info: ValidationInfo) -> Optional[str]:
         """Validate API key based on provider."""
         # API key validation happens at runtime when provider is initialized
         return v

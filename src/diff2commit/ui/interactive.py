@@ -4,14 +4,13 @@ from typing import Optional, List
 from prompt_toolkit import prompt
 from rich.prompt import Confirm, Prompt
 
-from diff2commit.ui import console
-from diff2commit.ui.console import display_commit_message
+from diff2commit.ui.console import console, display_commit_message
 
 
 class InteractiveEditor:
     """Interactive editor for commit messages."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the interactive editor."""
         self.current_message = ""
 
@@ -113,7 +112,7 @@ class InteractiveEditor:
         console.print("\\n[yellow]Edit the commit message (press Enter twice when done):[/yellow]")
         console.print("[dim]Tip: Keep the first line under 72 characters[/dim]\\n")
 
-        lines = []
+        lines: List[str] = []
         try:
             # Read multiple lines
             console.print(self.current_message)

@@ -63,13 +63,15 @@ class GitOperations:
                 is_empty=True,
             )
 
-        files_changed = []
-        change_types = {}
+        files_changed: List[str] = []
+        change_types: Dict[str, str] = {}
 
         for diff_item in diff_index:
             file_path = diff_item.b_path or diff_item.a_path
-            files_changed.append(file_path)
-            change_types[file_path] = diff_item.change_type
+            if file_path is not None:
+                files_changed.append(file_path)
+                if diff_item.change_type is not None:
+                    change_types[file_path] = diff_item.change_type
 
         # Get full diff text
         try:
@@ -120,10 +122,13 @@ class GitOperations:
         except TypeError:
             branch = "detached HEAD"
 
+        working_dir = self.repo.working_dir
+        root = str(working_dir) if working_dir else ""
+
         return {
             "branch": branch,
             "remote": self._get_remote_url(),
-            "root": self.repo.working_dir or "",
+            "root": root,
         }
 
     def _get_remote_url(self) -> str:

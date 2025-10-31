@@ -1,9 +1,11 @@
 """Main CLI application."""
 
-from typing import Optional
+from typing import Dict, Optional, Literal, Type, cast
+
 import typer
 
 from diff2commit.ai_providers.anthropic_provider import AnthropicProvider
+from diff2commit.ai_providers.base import AIProvider
 from diff2commit.ai_providers.gemini_provider import GeminiProvider
 from diff2commit.ai_providers.openai_provider import OpenAIProvider
 from diff2commit.config import Diff2CommitConfig, load_config
@@ -30,15 +32,19 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 
+AIProviderType = Literal["openai", "anthropic", "gemini"]
 
-def get_provider(config: Diff2CommitConfig):
+
+def get_provider(config: Diff2CommitConfig) -> AIProvider:
     """Get the appropriate AI provider based on configuration."""
-    providers = {"openai": OpenAIProvider, "anthropic": AnthropicProvider, "gemini": GeminiProvider}
-
+    providers: Dict[str, Type[AIProvider]] = {
+        "openai": OpenAIProvider,
+        "anthropic": AnthropicProvider,
+        "gemini": GeminiProvider,
+    }
     provider_class = providers.get(config.ai_provider)
     if not provider_class:
         raise ValueError(f"Unknown provider: {config.ai_provider}")
-
     return provider_class(config)
 
 
@@ -58,7 +64,7 @@ def generate(
     no_commit: bool = typer.Option(
         False, "--no-commit", help="Generate message without committing"
     ),
-):
+) -> None:
     """Generate and commit with AI-powered message."""
     try:
         # Load configuration
@@ -66,9 +72,15 @@ def generate(
 
         # Override config with CLI options
         if provider:
-            config.ai_provider = provider
+            # Validate and cast provider type
+            if provider not in ("openai", "anthropic", "gemini"):
+                print_error(f"Invalid provider: {provider}. Must be openai, anthropic, or gemini.")
+                raise typer.Exit(1)
+            config.ai_provider = cast(AIProviderType, provider)
+
         if model:
             config.ai_model = model
+
         if verbose:
             config.verbose = verbose
 
@@ -211,7 +223,7 @@ def generate(
 def usage(
     monthly: bool = typer.Option(False, "--monthly", help="Show only current month usage"),
     by_provider: bool = typer.Option(False, "--by-provider", help="Group by provider"),
-):
+) -> None:
     """Display token usage and cost statistics."""
     try:
         tracker = UsageTracker()
@@ -247,7 +259,7 @@ def usage(
 
 
 @app.command()
-def config():
+def config() -> None:
     """Display current configuration."""
     try:
         cfg = load_config()
@@ -276,12 +288,12 @@ def config():
 
 
 @app.command()
-def version():
+def version() -> None:
     """Show version information."""
     console.print(f"\n[bold cyan]diff2commit[/bold cyan] version [green]{__version__}[/green]\n")
 
 
-def main():
+def main() -> None:
     """Main entry point."""
     app()
 

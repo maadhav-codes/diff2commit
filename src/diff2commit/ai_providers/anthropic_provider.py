@@ -2,6 +2,7 @@
 
 from typing import Dict, Any
 from anthropic import Anthropic, AuthenticationError, RateLimitError
+from anthropic.types import TextBlock
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
 from diff2commit.ai_providers.base import AIProvider, CommitMessage
@@ -46,7 +47,13 @@ class AnthropicProvider(AIProvider):
                 messages=[{"role": "user", "content": prompt}],
             )
 
-            message_text = response.content[0].text.strip()
+            # Type narrow to TextBlock before accessing .text
+            content_block = response.content[0]
+            if isinstance(content_block, TextBlock):
+                message_text = content_block.text.strip()
+            else:
+                raise RuntimeError(f"Unexpected content block type: {type(content_block)}")
+
             tokens = response.usage.input_tokens + response.usage.output_tokens
             cost = self._calculate_cost(tokens, self.model)
 

@@ -106,7 +106,7 @@ def generate(
             ai_provider = get_provider(config)
         except ValueError as e:
             print_error(str(e))
-            print_info("Set your API key: export AI_COMMIT_API_KEY='your-key-here'")
+            print_info("Set your API key: export D2C_API_KEY='your-key-here'")
             raise typer.Exit(1)
 
         # Generate commit messages

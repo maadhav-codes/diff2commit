@@ -24,9 +24,7 @@ class OpenAIProvider(AIProvider):
         super().__init__(config)
 
         if not config.api_key:
-            raise ValueError(
-                "OpenAI API key is required. Set AI_COMMIT_API_KEY environment variable."
-            )
+            raise ValueError("OpenAI API key is required. Set D2C_API_KEY environment variable.")
 
         self.client = OpenAI(
             api_key=config.api_key, base_url=config.api_endpoint, timeout=config.timeout

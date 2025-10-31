@@ -62,14 +62,14 @@ class Diff2CommitConfig(BaseSettings):
     def get_config_path(self) -> Path:
         """Get the configuration file path."""
         home = Path.home()
-        config_dir = home / ".config" / "ai-commit"
+        config_dir = home / ".config" / "d2c"
         config_dir.mkdir(parents=True, exist_ok=True)
         return config_dir / "config.toml"
 
     def get_usage_db_path(self) -> Path:
         """Get the usage database path."""
         home = Path.home()
-        data_dir = home / ".local" / "share" / "ai-commit"
+        data_dir = home / ".local" / "share" / "d2c"
         data_dir.mkdir(parents=True, exist_ok=True)
         return data_dir / "usage.db"
 

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "diff2commit"
-version = "1.0.0"
+version = "1.0.1"
 description = "CLI tool that automatically generates clear, descriptive commit messages from staged Git diffs using AI"
 authors = [{name = "Mayur Dayal", email = "mayurdayal.engineer@gmail.com"}]
 readme = "README.md"

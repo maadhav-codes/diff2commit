@@ -114,8 +114,8 @@ Create a `.env` file in your project or set environment variables:
 D2C_API_KEY=your-api-key-here
 
 # Optional
-D2C_PROVIDER=openai          # openai, anthropic, or gemini
-D2C_MODEL=gpt-4              # Model name
+D2C_AI_PROVIDER=openai          # openai, anthropic, or gemini
+D2C_AI_MODEL=gpt-4              # Model name
 D2C_MAX_TOKENS=200           # Max tokens for generation
 D2C_TEMPERATURE=0.7          # Sampling temperature (0.0-2.0)
 D2C_COMMIT_FORMAT=conventional
@@ -170,24 +170,24 @@ The tool generates messages following the Conventional Commits specification:
 
 ```bash
 export D2C_API_KEY='sk-...'
-export D2C_PROVIDER='openai'
-export D2C_MODEL='gpt-4'
+export D2C_AI_PROVIDER='openai'
+export D2C_AI_MODEL='gpt-4'
 ```
 
 ### Anthropic Claude
 
 ```bash
 export D2C_API_KEY='sk-ant-...'
-export D2C_PROVIDER='anthropic'
-export D2C_MODEL='claude-3-sonnet-20240229'
+export D2C_AI_PROVIDER='anthropic'
+export D2C_AI_MODEL='claude-3-sonnet-20240229'
 ```
 
 ### Google Gemini
 
 ```bash
 export D2C_API_KEY='AI...'
-export D2C_PROVIDER='gemini'
-export D2C_MODEL='gemini-pro'
+export D2C_AI_PROVIDER='gemini'
+export D2C_AI_MODEL='gemini-pro'
 ```
 
 ## Cost Management

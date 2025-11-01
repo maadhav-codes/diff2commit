@@ -4,7 +4,6 @@ from typing import Dict, Optional, Literal, Type, cast
 
 import typer
 
-from diff2commit.ai_providers.anthropic_provider import AnthropicProvider
 from diff2commit.ai_providers.base import AIProvider
 from diff2commit.ai_providers.gemini_provider import GeminiProvider
 from diff2commit.ai_providers.openai_provider import OpenAIProvider
@@ -32,14 +31,13 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 
-AIProviderType = Literal["openai", "anthropic", "gemini"]
+AIProviderType = Literal["openai", "gemini"]
 
 
 def get_provider(config: Diff2CommitConfig) -> AIProvider:
     """Get the appropriate AI provider based on configuration."""
     providers: Dict[str, Type[AIProvider]] = {
         "openai": OpenAIProvider,
-        "anthropic": AnthropicProvider,
         "gemini": GeminiProvider,
     }
     provider_class = providers.get(config.ai_provider)
@@ -57,7 +55,7 @@ def generate(
         1, "--count", "-c", min=1, max=5, help="Number of message suggestions to generate"
     ),
     provider: Optional[str] = typer.Option(
-        None, "--provider", "-p", help="Override AI provider (openai, anthropic, gemini)"
+        None, "--provider", "-p", help="Override AI provider (openai, gemini)"
     ),
     model: Optional[str] = typer.Option(None, "--model", "-m", help="Override AI model"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
@@ -73,8 +71,8 @@ def generate(
         # Override config with CLI options
         if provider:
             # Validate and cast provider type
-            if provider not in ("openai", "anthropic", "gemini"):
-                print_error(f"Invalid provider: {provider}. Must be openai, anthropic, or gemini.")
+            if provider not in ("openai", "gemini"):
+                print_error(f"Invalid provider: {provider}. Must be openai, or gemini.")
                 raise typer.Exit(1)
             config.ai_provider = cast(AIProviderType, provider)
 

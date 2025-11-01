@@ -20,13 +20,11 @@ def test_config_defaults() -> None:
 def test_config_from_env(monkeypatch: MonkeyPatch) -> None:
     """Test configuration from environment variables."""
     monkeypatch.setenv("D2C_API_KEY", "env-test-key")
-    monkeypatch.setenv("D2C_AI_PROVIDER", "anthropic")
     monkeypatch.setenv("D2C_AI_MODEL", "claude-3-sonnet")
 
     config = load_config()
 
     assert config.api_key == "env-test-key"
-    assert config.ai_provider == "anthropic"
     assert config.ai_model == "claude-3-sonnet"
 
 

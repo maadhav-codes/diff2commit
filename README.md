@@ -7,7 +7,7 @@
 - **AI-Powered Generation**: Leverages GPT-4, Claude, or Gemini to analyze your changes and generate meaningful commit messages.
 - **Conventional Commits**: Automatically formats messages according to the Conventional Commits specification.
 - **Interactive Review**: Review, edit, and approve messages before committing.
-- **Multiple AI Providers**: Support for OpenAI, Anthropic Claude, and Google Gemini.
+- **Multiple AI Providers**: Support for OpenAI, and Google Gemini.
 - **Cost Tracking**: Monitor token usage and API costs.
 - **Customizable**: Configure models, prompts, and message formats.
 - **Beautiful CLI**: Rich terminal UI with syntax highlighting.
@@ -66,7 +66,7 @@ diff2commit generate
 diff2commit generate --count 3
 
 # Use a different AI provider
-diff2commit generate --provider anthropic
+diff2commit generate --provider gemini
 
 # Use specific model
 diff2commit generate --model gpt-4-turbo
@@ -114,7 +114,7 @@ Create a `.env` file in your project or set environment variables:
 D2C_API_KEY=your-api-key-here
 
 # Optional
-D2C_AI_PROVIDER=openai          # openai, anthropic, or gemini
+D2C_AI_PROVIDER=openai          # openai, or gemini
 D2C_AI_MODEL=gpt-4              # Model name
 D2C_MAX_TOKENS=200           # Max tokens for generation
 D2C_TEMPERATURE=0.7          # Sampling temperature (0.0-2.0)
@@ -172,14 +172,6 @@ The tool generates messages following the Conventional Commits specification:
 export D2C_API_KEY='sk-...'
 export D2C_AI_PROVIDER='openai'
 export D2C_AI_MODEL='gpt-4'
-```
-
-### Anthropic Claude
-
-```bash
-export D2C_API_KEY='sk-ant-...'
-export D2C_AI_PROVIDER='anthropic'
-export D2C_AI_MODEL='claude-3-sonnet-20240229'
 ```
 
 ### Google Gemini

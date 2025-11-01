@@ -11,7 +11,7 @@ class Diff2CommitConfig(BaseSettings):
     """Configuration for Diff2Commit CLI tool."""
 
     # AI Provider Settings
-    ai_provider: Literal["openai", "anthropic", "gemini"] = Field(
+    ai_provider: Literal["openai", "gemini"] = Field(
         default="openai",
         description="AI provider to use for generating commit messages",
     )

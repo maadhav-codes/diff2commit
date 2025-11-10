@@ -1,12 +1,13 @@
 """Main CLI application."""
 
-from typing import Dict, Optional, Literal, Type, cast
+from typing import Dict, Literal, Optional, Type
 
 import typer
 
 from diff2commit.ai_providers.base import AIProvider
 from diff2commit.ai_providers.gemini_provider import GeminiProvider
 from diff2commit.ai_providers.openai_provider import OpenAIProvider
+from diff2commit.ai_providers.openrouter_provider import OpenRouterProvider
 from diff2commit.config import Diff2CommitConfig, load_config
 from diff2commit.git_operations import GitOperations
 from diff2commit.ui.console import (
@@ -31,18 +32,24 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 
-AIProviderType = Literal["openai", "gemini"]
+ProviderType = Literal["openrouter", "openai", "gemini"]
 
 
 def get_provider(config: Diff2CommitConfig) -> AIProvider:
     """Get the appropriate AI provider based on configuration."""
     providers: Dict[str, Type[AIProvider]] = {
+        "openrouter": OpenRouterProvider,
         "openai": OpenAIProvider,
         "gemini": GeminiProvider,
     }
+
     provider_class = providers.get(config.ai_provider)
     if not provider_class:
-        raise ValueError(f"Unknown provider: {config.ai_provider}")
+        raise ValueError(
+            f"Unknown provider: {config.ai_provider}. "
+            f"Supported: openrouter (free), openai, gemini"
+        )
+
     return provider_class(config)
 
 
@@ -54,8 +61,8 @@ def generate(
     count: int = typer.Option(
         1, "--count", "-c", min=1, max=5, help="Number of message suggestions to generate"
     ),
-    provider: Optional[str] = typer.Option(
-        None, "--provider", "-p", help="Override AI provider (openai, gemini)"
+    provider: Optional[ProviderType] = typer.Option(
+        None, "--provider", "-p", help="Override AI provider (openrouter, openai, gemini)"
     ),
     model: Optional[str] = typer.Option(None, "--model", "-m", help="Override AI model"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
@@ -70,17 +77,28 @@ def generate(
 
         # Override config with CLI options
         if provider:
-            # Validate and cast provider type
-            if provider not in ("openai", "gemini"):
-                print_error(f"Invalid provider: {provider}. Must be openai, or gemini.")
+            config.ai_provider = provider
+
+            # Warn if using paid provider without API key
+            if provider in ["openai", "gemini"] and not config.api_key:
+                print_warning(
+                    f"Using {provider} requires an API key. "
+                    f"Set D2C_API_KEY environment variable."
+                )
+                print_info("Tip: Use default 'openrouter' provider for FREE usage!")
                 raise typer.Exit(1)
-            config.ai_provider = cast(AIProviderType, provider)
 
         if model:
             config.ai_model = model
-
         if verbose:
             config.verbose = verbose
+
+        # Show provider info
+        if config.verbose or config.ai_provider != "openrouter":
+            if config.ai_provider == "openrouter" and "free" in config.ai_model.lower():
+                console.print("[dim]Using FREE OpenRouter Qwen model (no API key needed)[/dim]")
+            else:
+                console.print(f"[dim]Using {config.ai_provider} with {config.ai_model}[/dim]")
 
         # Initialize Git operations
         try:
@@ -116,7 +134,9 @@ def generate(
             ai_provider = get_provider(config)
         except ValueError as e:
             print_error(str(e))
-            print_info("Set your API key: export D2C_API_KEY='your-key-here'")
+            if config.ai_provider != "openrouter":
+                print_info("Set your API key: export D2C_API_KEY='your-key-here'")
+                print_info("Or use the FREE default: diff2commit generate --provider openrouter")
             raise typer.Exit(1)
 
         # Generate commit messages
@@ -152,8 +172,9 @@ def generate(
                         )
 
                     if config.verbose:
+                        cost_str = "FREE" if commit_msg.cost == 0 else f"${commit_msg.cost:.4f}"
                         print_info(
-                            f"Generated message {i+1}: {commit_msg.tokens_used} tokens, ${commit_msg.cost:.4f}"
+                            f"Generated message {i+1}: {commit_msg.tokens_used} tokens, {cost_str}"
                         )
 
                 except Exception as e:
@@ -210,7 +231,7 @@ def generate(
         raise typer.Exit(130)
     except Exception as e:
         print_error(f"Unexpected error: {e}")
-        if config.verbose:
+        if hasattr(config, "verbose") and config.verbose:
             import traceback
 
             console.print(traceback.format_exc())
@@ -238,18 +259,20 @@ def usage(
             console.print("\n[bold]📊 Usage by Provider[/bold]\n")
 
             for p in providers:
+                cost_str = "FREE" if p["cost"] == 0 else f"${p['cost']:.4f}"
                 console.print(f"[cyan]{p['provider']}[/cyan] ({p['model']})")
                 console.print(f"  Requests: {p['requests']}")
                 console.print(f"  Tokens: {p['tokens']:,}")
-                console.print(f"  Cost: ${p['cost']:.4f}\n")
+                console.print(f"  Cost: {cost_str}\n")
 
         else:
             total = tracker.get_total_usage()
+            cost_str = "FREE" if total["total_cost"] == 0 else f"${total['total_cost']:.4f}"
             console.print("\n[bold]📊 Total Usage Statistics[/bold]\n")
             console.print(f"  Total Requests: {total['total_requests']}")
             console.print(f"  Successful: {total['successful_requests']}")
             console.print(f"  Total Tokens: {total['total_tokens']:,}")
-            console.print(f"  Total Cost: ${total['total_cost']:.4f}\n")
+            console.print(f"  Total Cost: {cost_str}\n")
 
     except Exception as e:
         print_error(f"Failed to retrieve usage statistics: {e}")
@@ -264,7 +287,12 @@ def config() -> None:
 
         console.print("\n[bold]⚙️  Current Configuration[/bold]\n")
         console.print(f"  AI Provider: [cyan]{cfg.ai_provider}[/cyan]")
-        console.print(f"  AI Model: {cfg.ai_model}")
+
+        if cfg.ai_provider == "openrouter" and "free" in cfg.ai_model.lower():
+            console.print(f"  AI Model: {cfg.ai_model} [green](FREE)[/green]")
+        else:
+            console.print(f"  AI Model: {cfg.ai_model}")
+
         console.print(f"  Max Tokens: {cfg.max_tokens}")
         console.print(f"  Temperature: {cfg.temperature}")
         console.print(f"  Commit Format: {cfg.commit_format}")
@@ -275,10 +303,20 @@ def config() -> None:
             masked_key = cfg.api_key[:8] + "..." + cfg.api_key[-4:]
             console.print(f"  API Key: {masked_key}")
         else:
-            console.print("  API Key: [red]Not set[/red]")
+            if cfg.ai_provider == "openrouter":
+                console.print("  API Key: [green]Using built-in FREE key[/green]")
+            else:
+                console.print("  API Key: [red]Not set[/red]")
 
         console.print(f"\n[dim]Config file: {cfg.get_config_path()}[/dim]")
-        console.print(f"[dim]Usage database: {cfg.get_usage_db_path()}[/dim]\n")
+        console.print(f"[dim]Usage database: {cfg.get_usage_db_path()}[/dim]")
+
+        if cfg.ai_provider == "openrouter":
+            console.print(
+                "\\n[green]💡 Tip: You're using FREE OpenRouter - no API key needed![/green]"
+            )
+
+        console.print()
 
     except Exception as e:
         print_error(f"Failed to load configuration: {e}")
@@ -288,7 +326,9 @@ def config() -> None:
 @app.command()
 def version() -> None:
     """Show version information."""
-    console.print(f"\n[bold cyan]diff2commit[/bold cyan] version [green]{__version__}[/green]\n")
+    console.print(f"\n[bold cyan]diff2commit[/bold cyan] version [green]{__version__}[/green]")
+    console.print("[dim]Default: OpenRouter Qwen 2.5 Coder 32B (FREE)[/dim]")
+    console.print("[dim]Also supports: OpenAI GPT, Google Gemini (requires API key)[/dim]\\n")
 
 
 def main() -> None:

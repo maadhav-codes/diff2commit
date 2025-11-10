@@ -10,8 +10,8 @@ def test_config_defaults() -> None:
     """Test default configuration values."""
     config = Diff2CommitConfig(api_key="test-key")
 
-    assert config.ai_provider == "openai"
-    assert config.ai_model == "gpt-4"
+    assert config.ai_provider == "openrouter"
+    assert config.ai_model == "qwen/qwen-2.5-coder-32b-instruct:free"
     assert config.max_tokens == 200
     assert config.temperature == 0.7
     assert config.commit_format == "conventional"

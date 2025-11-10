@@ -118,6 +118,10 @@ class AIProvider(ABC):
         Returns:
             Estimated cost in USD
         """
+        # Free models have no cost
+        if "free" in model.lower():
+            return 0.0
+
         # Pricing per 1K tokens (approximate as of 2025)
         pricing = {
             # OpenAI
@@ -127,6 +131,8 @@ class AIProvider(ABC):
             # Gemini
             "gemini-pro": {"input": 0.00025, "output": 0.0005},
             "gemini-ultra": {"input": 0.001, "output": 0.002},
+            # OpenRouter (non-free models)
+            "qwen": {"input": 0.0, "output": 0.0},  # Free tier
         }
 
         # Find matching pricing

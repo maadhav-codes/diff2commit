@@ -3,7 +3,7 @@
 from typing import Optional, Literal
 from pathlib import Path
 
-from pydantic import Field, field_validator, ValidationInfo
+from pydantic import Field, ValidationInfo, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -11,12 +11,16 @@ class Diff2CommitConfig(BaseSettings):
     """Configuration for Diff2Commit CLI tool."""
 
     # AI Provider Settings
-    ai_provider: Literal["openai", "gemini"] = Field(
-        default="openai",
-        description="AI provider to use for generating commit messages",
+    ai_provider: Literal["openrouter", "openai", "gemini"] = Field(
+        default="openrouter", description="AI provider to use for generating commit messages"
     )
-    ai_model: str = Field(default="gpt-4", description="AI model to use")
-    api_key: Optional[str] = Field(default=None, description="API key for the AI provider")
+    ai_model: str = Field(
+        default="qwen/qwen-2.5-coder-32b-instruct:free", description="AI model to use"
+    )
+    api_key: Optional[str] = Field(
+        default=None,
+        description="API key for the AI provider (not required for OpenRouter free tier)",
+    )
     api_endpoint: Optional[str] = Field(default=None, description="Custom API endpoint (optional)")
 
     # Generation Settings

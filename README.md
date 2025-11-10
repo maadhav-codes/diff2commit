@@ -4,11 +4,11 @@
 
 ## Features
 
-- **AI-Powered Generation**: Leverages GPT-4, Claude, or Gemini to analyze your changes and generate meaningful commit messages.
+- **AI-Powered Generation**: Leverages powerful LLMs including Qwen 2.5 Coder 32B (free), GPT-4, or Gemini to analyze your changes and generate meaningful commit messages. No API key needed for the default model!
 - **Conventional Commits**: Automatically formats messages according to the Conventional Commits specification.
 - **Interactive Review**: Review, edit, and approve messages before committing.
-- **Multiple AI Providers**: Support for OpenAI, and Google Gemini.
-- **Cost Tracking**: Monitor token usage and API costs.
+- **Multiple AI Providers**: Support for OpenRouter (default, free), OpenAI, and Google Gemini.
+- **Cost Tracking**: Monitor token usage and API costs (always FREE with OpenRouter default).
 - **Customizable**: Configure models, prompts, and message formats.
 - **Beautiful CLI**: Rich terminal UI with syntax highlighting.
 
@@ -36,22 +36,23 @@ pipx install diff2commit
 
 ## Quick Start
 
-1. **Set your API key**:
-
-```bash
-export D2C_API_KEY='your-openai-api-key'
-```
-
-2. **Stage your changes**:
+1. **Stage your changes**:
 
 ```bash
 git add .
 ```
 
-3. **Generate and commit**:
+2. **Generate and commit (FREE with no API key)**:
 
 ```bash
 diff2commit generate
+```
+
+3. **For other providers (OpenAI, Gemini)**:
+
+```bash
+export D2C_API_KEY='your-openai-api-key' # Required for OpenAI/Gemini
+diff2commit generate --provider openai  # or gemini
 ```
 
 ## Usage
@@ -59,16 +60,19 @@ diff2commit generate
 ### Generate Commit Message
 
 ```bash
-# Generate with interactive review
+# Generate with interactive review (default: OpenRouter, FREE)
 diff2commit generate
 
 # Generate multiple suggestions
 diff2commit generate --count 3
 
-# Use a different AI provider
+# Use OpenAI (requires API key)
+diff2commit generate --provider openai
+
+# Use Gemini (requires API key)
 diff2commit generate --provider gemini
 
-# Use specific model
+# Use specific model (OpenRouter/Gemini can be customized)
 diff2commit generate --model gpt-4-turbo
 
 # Skip interactive review
@@ -81,7 +85,7 @@ diff2commit generate --no-commit
 ### View Usage Statistics
 
 ```bash
-# Total usage
+# Total usage (will show FREE for OpenRouter)
 diff2commit usage
 
 # Current month usage
@@ -110,14 +114,14 @@ diff2commit version
 Create a `.env` file in your project or set environment variables:
 
 ```bash
-# Required
+# Only required for OpenAI and Gemini (not needed for default OpenRouter)
 D2C_API_KEY=your-api-key-here
 
-# Optional
-D2C_AI_PROVIDER=openai          # openai, or gemini
-D2C_AI_MODEL=gpt-4              # Model name
-D2C_MAX_TOKENS=200           # Max tokens for generation
-D2C_TEMPERATURE=0.7          # Sampling temperature (0.0-2.0)
+# Optional: AI provider (default: openrouter)
+D2C_AI_PROVIDER=openrouter     # openrouter, openai, or gemini
+D2C_AI_MODEL=qwen/qwen-2.5-coder-32b-instruct:free # Optional: Model (gpt-4)
+D2C_MAX_TOKENS=200           # Optional: Max tokens for generation
+D2C_TEMPERATURE=0.7          # Optional: Sampling temperature (0.0-2.0)
 D2C_COMMIT_FORMAT=conventional
 D2C_INCLUDE_EMOJI=false
 D2C_MAX_SUBJECT_LENGTH=72
@@ -129,8 +133,8 @@ D2C_TRACK_USAGE=true
 Create `~/.config/diff2commit/config.toml`:
 
 ```toml
-ai_provider = "openai"
-ai_model = "gpt-4"
+ai_provider = "openrouter"
+ai_model = "qwen/qwen-2.5-coder-32b-instruct:free"
 max_tokens = 200
 temperature = 0.7
 commit_format = "conventional"
@@ -166,7 +170,18 @@ The tool generates messages following the Conventional Commits specification:
 
 ## AI Providers
 
+### OpenRouter (FREE - Default)
+
+No API key needed! Uses Qwen 2.5 Coder 32B Instruct model.
+
+```bash
+# Everything works out of the box
+diff2commit generate
+```
+
 ### OpenAI (GPT-4)
+
+Requires OpenAI API key.
 
 ```bash
 export D2C_API_KEY='sk-...'
@@ -175,6 +190,8 @@ export D2C_AI_MODEL='gpt-4'
 ```
 
 ### Google Gemini
+
+Requires Gemini API key.
 
 ```bash
 export D2C_API_KEY='AI...'
@@ -248,6 +265,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [Rich](https://rich.readthedocs.io/) for beautiful terminal output
 - [GitPython](https://gitpython.readthedocs.io/) for Git operations
 - Inspired by the [Conventional Commits](https://www.conventionalcommits.org/) specification
+- Powered by [OpenRouter](https://openrouter.ai/) for free LLM access
 
 ## Support
 

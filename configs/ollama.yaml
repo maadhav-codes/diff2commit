@@ -1,0 +1,8 @@
+# Inherits your full commit-message instruction from diff2commit/default.yaml.
+llm:
+  base_url: http://localhost:11434/v1
+  model: diff2commit-qwen:7b
+  api_key_env: OLLAMA_API_KEY
+  timeout: 180
+  reasoning_effort: null
+max_diff_bytes: 32000

@@ -1,0 +1,4 @@
+# Uses the original Qwen2.5-Coder 7B weights with room for the prompt and diff.
+FROM qwen2.5-coder:7b
+PARAMETER num_ctx 16384
+PARAMETER temperature 0.2
